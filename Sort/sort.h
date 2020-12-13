@@ -6,6 +6,10 @@
 #include <iostream>
 #include <stack>
 
+#ifdef _WIN32
+#include "vld.h"
+#endif
+
 using namespace std;
 
 void swap(int arr[], int i, int j) {
@@ -215,10 +219,47 @@ int partition(int arr[], int low, int high) {
 	return low;
 }
 
+// Œ»∂®≈≈–Ú
+int partition2(int arr[], int low, int high) {
+	int len = high - low + 1;
+	int temp = arr[low];
+	int pos = low + 1;
+	int* brr = (int*)malloc(sizeof(int) * len);
+	assert(nullptr != brr);
+	memset(brr, 0, sizeof(int) * len);
+	int mid = low;
+	int x = 0;
+	while (pos <= high) {
+		if (arr[pos] <= temp) {
+			brr[x++] = arr[pos];
+		}
+		pos++;
+	}
+	brr[x] = temp;
+	mid = low + x;
+
+	pos = high;
+	int y = len - 1;
+	while (pos >= low) {
+		if (arr[pos] >= temp) {
+			brr[y--] = arr[pos];
+		}
+		pos--;
+	}
+
+	for (int i = 0; i < len; ++i) {
+		arr[low + i] = brr[i];
+	}
+
+	free(brr);
+
+	return mid;
+}
+
 void qsort(int arr[], int start, int end) {
 	int mid;
 	while (start < end) {
-		mid = partition(arr, start, end);
+		mid = partition2(arr, start, end);
 		qsort(arr, start, mid - 1);
 		start = mid + 1;
 	}
@@ -240,7 +281,7 @@ void qsort2(int arr[], int low, int high) {
 			int h = sta.top();
 			sta.pop();
 
-			int mid = partition(arr, l, h);
+			int mid = partition2(arr, l, h);
 			if (mid + 1 < h) {
 				sta.push(h);
 				sta.push(mid + 1);
